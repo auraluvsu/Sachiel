@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  background: rgba(14, 14, 14, 0.6);
+  backdrop-filter: blur(25px);
+  font-family: "Inter", sans-serif;
+  color: white;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.editor {
+  width: 80%;
+  height: 80%;
+  border: 2px solid rgba(211, 175, 55, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(211, 175, 55, 0.3);
+  background: rgba(20, 20, 20, 0.4);
+  padding: 20px;
+  resize: none;
+  outline: none;
+  color: #f7f7f7;
+  font-size: 18px;
+  backdrop-filter: blur(30px);
+  transition: 0.3s;
+}
+
+.editor:focus {
+  border-color: #e6c550;
+  box-shadow: 0 0 40px rgba(230, 197, 80, 0.5);
+}
+
