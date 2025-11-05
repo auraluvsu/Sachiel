@@ -33,6 +33,8 @@ func main() {
 		Title:  "Sachiel",
 		Width:  900,
 		Height: 600,
+		// BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
+		// Frameless:        true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
