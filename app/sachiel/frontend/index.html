@@ -4,21 +4,30 @@
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Sachiel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="saveIndicator" class="save-indicator">
-    ✔︎
+  <div class="splash-screen">
+    <canvas id="logoCanvas"></canvas>
+    <svg id="svgLogo" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid meet" class="logo-svg">
+      <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" class="logo-text">
+      Sachiel
+      </text>
+    </svg>
   </div>
-<div id="app"></div>
-<textarea 
-     id="editor"
-     class="editor"
-     placeholder="Start typing . . ."
-     spellcheck="false"
-     autocorrect="off"
-     autocomplete="off"
-     autocapitalize="off"
-  ></textarea>
-<script src="./src/main.js" type="module"></script>
+
+  <div class="app-container hidden">
+    <div id="saveIndicator" class="save-indicator">✔︎</div>
+    <textarea
+      id="editor"
+      class="editor"
+      placeholder="Start typing . . ."
+      spellcheck="false"
+      autocorrect="off"
+      autocomplete="off"
+      autocapitalize="off"
+    ></textarea>
+  </div>
+  <script src="./src/main.js" type="module"></script>
 </body>
 </html>
