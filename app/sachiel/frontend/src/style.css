@@ -27,13 +27,15 @@ body {
 }
 
 textarea#editor {
+  font-family: "Comfortaa";
   border: 1px solid rgba(211,175,55,0.4);
   width: 100%;
   height: 100%;
-  padding: 24px;
+  padding: 80px;
   background: rgba(20, 20, 20, 0.6);
   color: #fdfdfd;
-  font-size: 18px;
+  font-size: 26px;
+  text-align: center;
   line-height: 1.6;
   resize: none;
   outline: none;
@@ -63,26 +65,38 @@ textarea#editor {
 /* checkmark indicator */
 .save-indicator {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 8px 14px;
-  background: rgba(30, 30, 30, 0.75);
-  color: var(--gold-light);
-  font-weight: 500;
-  font-size: 14px;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(230,197,80,0.4);
+  top: 18px;
+  right: 22px;
+  font-size: 22px;
+  font-weight: 400;
+  color: #d3af37;
   opacity: 0;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  transform: translateY(-10px);
+  transform: scale(0.9);
+  filter: drop-shadow(0 0 6px rgba(211,175,55,0.5));
+  pointer-events: none;
 }
 
-.save-indicator.visible {
-  opacity: 1;
-  transform: translateY(0);
+/* keyframes for fade in → hold → fade out */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
-.hidden {
-  display: none;
+/* when active, play the animation */
+.save-indicator.active {
+  animation: fadeInOut 1.8s ease forwards;
 }
-

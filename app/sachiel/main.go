@@ -30,9 +30,10 @@ func main() {
 	app := &App{}
 
 	err := wails.Run(&options.App{
-		Title:  "Sachiel",
-		Width:  900,
-		Height: 600,
+		Title:      "Sachiel",
+		Width:      900,
+		Height:     600,
+		Fullscreen: true,
 		// BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
 		// Frameless:        true,
 		AssetServer: &assetserver.Options{

@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>sachiel</title>
+    <title>Sachiel</title>
 </head>
 <body>
-  <div id="saveIndicator" class="save-indicator hidden">
-    ✔︎ Saved
+  <div id="saveIndicator" class="save-indicator">
+    ✔︎
   </div>
 <div id="app"></div>
-<textarea id="editor" class="editor" placeholder="Write in flow..."></textarea>
+<textarea 
+     id="editor"
+     class="editor"
+     placeholder="Start typing . . ."
+     spellcheck="false"
+     autocorrect="off"
+     autocomplete="off"
+     autocapitalize="off"
+  ></textarea>
 <script src="./src/main.js" type="module"></script>
 </body>
 </html>
