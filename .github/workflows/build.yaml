@@ -49,3 +49,11 @@ jobs:
           name: sachiel-${{ matrix.os }}
           path: build/bin/
 
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: build/bin/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
