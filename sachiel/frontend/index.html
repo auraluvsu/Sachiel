@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sachiel</title>
+
+    <!-- Fonts & Styles -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Comfortaa&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+
+  <body>
+    <!-- Splash Screen -->
+    <div class="splash-screen">
+      <canvas id="logoCanvas"></canvas>
+      <svg
+        id="svgLogo"
+        viewBox="0 0 1200 400"
+        preserveAspectRatio="xMidYMid meet"
+        class="logo-svg"
+      >
+        <text
+          x="50%"
+          y="55%"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          class="logo-text"
+        >
+          Sachiel
+        </text>
+      </svg>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container">
+      <div id="saveIndicator" class="save-indicator">✔︎</div>
+      <textarea
+        id="editor"
+        placeholder="Start typing . . ."
+        spellcheck="false"
+        autocorrect="off"
+        autocomplete="off"
+        autocapitalize="off"
+      ></textarea>
+    </div>
+
+    <script src="./src/main.js" type="module"></script>
+  </body>
+</html>
+

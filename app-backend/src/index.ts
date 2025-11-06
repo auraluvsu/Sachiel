@@ -1,3 +1,4 @@
+/// This is the Regular server that writes to a postgres DB
 // import * as http from 'http'
 // import { Pool } from 'pg'
 // const pool = new Pool({database: "sachiel"})

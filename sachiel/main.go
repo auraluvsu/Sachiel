@@ -10,6 +10,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
+//go:embed all:frontend
 var assets embed.FS
 
 // App structure
@@ -36,6 +37,7 @@ func main() {
 		Fullscreen: true,
 		// BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
 		// Frameless:        true,
+		Debug: options.Debug{},
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
