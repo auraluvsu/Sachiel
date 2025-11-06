@@ -8,6 +8,10 @@ on:
 
 jobs:
   build:
+    defaults:
+      run:
+        working-directory: ../../sachiel
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -30,16 +34,14 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      # ✅ FIXED: make sure we install dependencies in the correct path
       - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
+        working-directory: ./frontend
+        run: npm ci
 
       - name: Build Wails app
-        run: |
-          export PATH=$PATH:$(go env GOPATH)/bin
-          wails build -clean -platform ${{ matrix.os }}
+        env:
+          PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
+        run: wails build -clean -platform ${{ matrix.os }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
