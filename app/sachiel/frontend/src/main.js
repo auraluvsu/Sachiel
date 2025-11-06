@@ -37,85 +37,96 @@ window.addEventListener("load", () => {
 
 
   // High DPI fix
-  function resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1.5;
+
+  // physical pixels
+  const displayWidth = Math.floor(window.innerWidth * dpr);
+  const displayHeight = Math.floor(window.innerHeight * dpr);
+
+  if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+
+    // Reset transform before scaling
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
   }
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
 
-  // Wait for font before drawing
-  document.fonts.ready.then(() => {
-    console.log("Font loaded, drawing...");
-  });
+  // also tell the SVG to resize proportionally
+  const svg = document.getElementById("svgLogo");
+  if (svg) {
+    svg.setAttribute("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`);
+    svg.style.width = "100vw";
+    svg.style.height = "100vh";
+    svg.style.preserveAspectRatio = "xMidYMid meet";
+  }
+}
+function createAndAnimateParticles(centerX, centerY) {
+  // Grab current text pixels
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const particles = [];
 
-  function createAndAnimateParticles(centerX, centerY) {
-    // Grab current text pixels
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const particles = [];
-
-    for (let y = 0; y < canvas.height; y += 4) {
-      for (let x = 0; x < canvas.width; x += 4) {
-        const i = (y * canvas.width + x) * 4;
-        const alpha = imageData.data[i + 3];
-        if (alpha > 128) {
-          particles.push({
-            x: x,
-            y: y,
-            speedX: (Math.random() - 0.5) * 10,
-            speedY: (Math.random() - 1.2) * 8,
-            size: Math.random() * 2 + 1,
-            alpha: 1,
-            color: `rgba(230,197,80,${Math.random() * 0.8 + 0.2})`,
-          });
-        }
+  for (let y = 0; y < canvas.height; y += 4) {
+    for (let x = 0; x < canvas.width; x += 4) {
+      const i = (y * canvas.width + x) * 4;
+      const alpha = imageData.data[i + 3];
+      if (alpha > 128) {
+        particles.push({
+          x: x,
+          y: y,
+          speedX: (Math.random() - 0.5) * 10,
+          speedY: (Math.random() - 1.2) * 8,
+          size: Math.random() * 2 + 1,
+          alpha: 1,
+          color: `rgba(230,197,80,${Math.random() * 0.8 + 0.2})`,
+        });
       }
     }
+  }
 
-    // Clear original text after capture
+  // Clear original text after capture
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  animateParticles(particles);
+}
+
+function animateParticles(particles) {
+  function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    animateParticles(particles);
-  }
+    ctx.globalCompositeOperation = "lighter";
 
-  function animateParticles(particles) {
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = "lighter";
+    particles.forEach((p) => {
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.speedY += 0.08; // gravity
+      p.alpha -= 0.015;
 
-      particles.forEach((p) => {
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.speedY += 0.08; // gravity
-        p.alpha -= 0.015;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = p.color;
+      ctx.fillStyle = p.color.replace(")", `,${p.alpha})`);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
 
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = p.color;
-        ctx.fillStyle = p.color.replace(")", `,${p.alpha})`);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      if (particles.some((p) => p.alpha > 0)) {
-        requestAnimationFrame(animate);
-      } else {
-        endSplash();
-      }
+    if (particles.some((p) => p.alpha > 0)) {
+      requestAnimationFrame(animate);
+    } else {
+      endSplash();
     }
-
-    animate();
   }
 
-  function endSplash() {
-    splash.style.transition = "opacity 1.5s ease";
-    splash.style.opacity = 0;
-    setTimeout(() => {
-      splash.style.display = "none";
-      app.classList.add("visible");
-    }, 1500);
-  }
+  animate();
+}
+
+function endSplash() {
+  splash.style.transition = "opacity 1.5s ease";
+  splash.style.opacity = 0;
+  setTimeout(() => {
+    splash.style.display = "none";
+    app.classList.add("visible");
+  }, 1500);
+}
 });
 
 // manual save (Ctrl+S)
