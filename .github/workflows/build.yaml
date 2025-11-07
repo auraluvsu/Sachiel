@@ -36,7 +36,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ libgtk-3-dev libwebkit2gtk-4.0-dev pkg-config
+          sudo apt-get install -y gcc g++ pkg-config
 
       - name: Install dependencies on macOS
         if: matrix.os == 'macos-latest'
