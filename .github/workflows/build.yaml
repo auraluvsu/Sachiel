@@ -29,15 +29,16 @@ jobs:
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
+      # 👇 FIXED: only one sachiel/ path now
       - name: Install frontend dependencies
-        working-directory: ./sachiel/sachiel/frontend
+        working-directory: ./sachiel/frontend
         run: npm install
 
       - name: Build Wails app
         env:
           PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
         run: |
-          cd sachiel/sachiel
+          cd sachiel
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             wails build -clean -platform windows/amd64
           else
@@ -48,9 +49,9 @@ jobs:
         run: |
           mkdir -p dist
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            zip -r "dist/sachiel-${{ github.ref_name }}-windows.zip" ./sachiel/sachiel/build/bin/*
+            zip -r "dist/sachiel-${{ github.ref_name }}-windows.zip" ./sachiel/build/bin/*
           else
-            tar -czf "dist/sachiel-${{ github.ref_name }}-linux.tar.gz" ./sachiel/sachiel/build/bin/*
+            tar -czf "dist/sachiel-${{ github.ref_name }}-linux.tar.gz" ./sachiel/build/bin/*
           fi
 
       - name: Upload build artifacts
