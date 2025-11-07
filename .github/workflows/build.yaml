@@ -40,6 +40,12 @@ jobs:
       - name: Install frontend dependencies
         working-directory: sachiel/frontend
         run: npm ci
+      - name: Fix macOS sysctl PATH
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "/usr/sbin" >> $GITHUB_PATH
+          which sysctl || echo "sysctl not found in default path, added manually."
+
 
       - name: Build Wails app
         env:
