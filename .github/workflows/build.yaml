@@ -11,14 +11,14 @@ permissions:
 
 jobs:
   build:
-    defaults:
-      run:
-        working-directory: sachiel
-
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        working-directory: sachiel
 
     steps:
       - name: Checkout code
@@ -46,17 +46,35 @@ jobs:
           PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
         run: wails build -clean -platform ${{ matrix.os }}
 
-      - name: Upload build artifact
+      - name: Archive binary
+        run: |
+          mkdir -p release
+          cp -r build/bin/* release/
+          cd release
+          zip -r ../sachiel-${{ matrix.os }}.zip .
+          cd ..
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: sachiel-${{ matrix.os }}
-          path: build/bin/
+          path: sachiel/sachiel-${{ matrix.os }}.zip
 
-      - name: Publish to GitHub Releases
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: build/bin/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/**/*.zip
+          generate_release_notes: true
 
