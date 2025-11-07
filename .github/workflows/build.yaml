@@ -3,78 +3,91 @@ name: Build & Release Sachiel
 on:
   push:
     tags:
-      - "v*"
-  workflow_dispatch:
-
-permissions:
-  contents: write
+      - "v*.*.*"
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
 
-    defaults:
-      run:
-        working-directory: sachiel
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.23"
+          go-version: "1.23.2"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
+      - name: Install system dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config
+
+      - name: Install dependencies on macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install gtk+3 webkit2gtk pkg-config
+
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Install frontend dependencies
-        working-directory: sachiel/frontend
-        run: npm ci
+        working-directory: ./sachiel/frontend
+        run: npm install
 
       - name: Build Wails app
         env:
           PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
-        run: wails build -clean -platform ${{ matrix.os }}
+        run: |
+          cd sachiel
+          case "${{ matrix.os }}" in
+            "windows-latest") wails build -clean -platform windows/amd64 ;;
+            "ubuntu-latest") wails build -clean -platform linux/amd64 ;;
+            "macos-latest") wails build -clean -platform darwin/universal ;;
+          esac
 
       - name: Archive binary
         run: |
-          mkdir -p release
-          cp -r build/bin/* release/
-          cd release
-          zip -r ../sachiel-${{ matrix.os }}.zip .
-          cd ..
+          mkdir -p dist
+          cd sachiel/build/bin
+          FILE=$(ls | head -n 1)
+          cd ../../..
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            zip -r "dist/sachiel-${{ github.ref_name }}-windows.zip" "sachiel/build/bin/$FILE"
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            zip -r "dist/sachiel-${{ github.ref_name }}-macos.zip" "sachiel/build/bin/$FILE"
+          else
+            tar -czf "dist/sachiel-${{ github.ref_name }}-linux.tar.gz" "sachiel/build/bin/$FILE"
+          fi
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: sachiel-${{ matrix.os }}
-          path: sachiel/sachiel-${{ matrix.os }}.zip
+          path: dist/*
 
   release:
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
     steps:
-      - name: Download all build artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: dist
+          path: ./artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ./artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: dist/**/*.zip
-          generate_release_notes: true
 
