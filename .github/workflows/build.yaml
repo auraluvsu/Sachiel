@@ -7,6 +7,9 @@ on:
 
 jobs:
   build:
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -21,6 +24,9 @@ jobs:
         with:
           go-version: "1.23.2"
 
+      - name: Add Go bin to PATH
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -30,7 +36,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config
+          sudo apt-get install -y gcc g++ libgtk-3-dev libwebkit2gtk-4.0-dev pkg-config
 
       - name: Install dependencies on macOS
         if: matrix.os == 'macos-latest'
@@ -46,29 +52,37 @@ jobs:
         run: npm install
 
       - name: Build Wails app
-        env:
-          PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
+        working-directory: ./sachiel
         run: |
-          cd sachiel
-          case "${{ matrix.os }}" in
-            "windows-latest") wails build -clean -platform windows/amd64 ;;
-            "ubuntu-latest") wails build -clean -platform linux/amd64 ;;
-            "macos-latest") wails build -clean -platform darwin/universal ;;
-          esac
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            wails build -clean -platform windows/amd64
+          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            wails build -clean -platform linux/amd64
+          else
+            wails build -clean -platform darwin/universal
+          fi
 
-      - name: Archive binary
+      - name: Archive binary (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           mkdir -p dist
-          cd sachiel/build/bin
-          FILE=$(ls | head -n 1)
-          cd ../../..
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            zip -r "dist/sachiel-${{ github.ref_name }}-windows.zip" "sachiel/build/bin/$FILE"
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            zip -r "dist/sachiel-${{ github.ref_name }}-macos.zip" "sachiel/build/bin/$FILE"
-          else
-            tar -czf "dist/sachiel-${{ github.ref_name }}-linux.tar.gz" "sachiel/build/bin/$FILE"
-          fi
+          tar -C sachiel/build/bin -czf "dist/sachiel-${{ github.ref_name }}-linux-amd64.tar.gz" sachiel
+
+      - name: Archive binary (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p dist
+          pushd sachiel/build/bin > /dev/null
+          zip -r "../../../dist/sachiel-${{ github.ref_name }}-macos-universal.zip" sachiel.app
+          popd > /dev/null
+
+      - name: Archive binary (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          $binary = Get-ChildItem -Path sachiel\build\bin -Filter *.exe | Select-Object -First 1
+          Compress-Archive -Path $binary.FullName -DestinationPath "dist\sachiel-${{ github.ref_name }}-windows-amd64.zip" -Force
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -91,4 +105,3 @@ jobs:
           files: ./artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
