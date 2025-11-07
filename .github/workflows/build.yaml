@@ -3,7 +3,7 @@ name: Build & Release Sachiel
 on:
   push:
     tags:
-      - "v*.*.*"   # Run when you push version tags like v1.1.5
+      - "v*.*.*"
 
 jobs:
   build:
@@ -11,10 +11,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        working-directory: projects/sachiel
-
 
     steps:
       - name: Checkout repository
@@ -34,14 +30,14 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Install frontend dependencies
-        working-directory: sachiel/frontend
+        working-directory: ./sachiel/sachiel/frontend
         run: npm install
 
       - name: Build Wails app
         env:
           PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
         run: |
-          cd sachiel
+          cd sachiel/sachiel
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             wails build -clean -platform windows/amd64
           else
@@ -52,12 +48,12 @@ jobs:
         run: |
           mkdir -p dist
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            zip -r "dist/sachiel-windows.zip" ./sachiel/build/bin/*
+            zip -r "dist/sachiel-${{ github.ref_name }}-windows.zip" ./sachiel/sachiel/build/bin/*
           else
-            tar -czf "dist/sachiel-linux.tar.gz" ./sachiel/build/bin/*
+            tar -czf "dist/sachiel-${{ github.ref_name }}-linux.tar.gz" ./sachiel/sachiel/build/bin/*
           fi
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: sachiel-${{ matrix.os }}
@@ -72,7 +68,7 @@ jobs:
         with:
           path: ./artifacts
 
-      - name: Create GitHub release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: ./artifacts/**/*
