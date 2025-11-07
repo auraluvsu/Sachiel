@@ -1,0 +1,15 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "sachiel",
+  "assetdir":"frontend",
+  "wailsjsdir":"frontend/src",
+  "outputfilename": "sachiel",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "",
+    "email": ""
+  }
+}
