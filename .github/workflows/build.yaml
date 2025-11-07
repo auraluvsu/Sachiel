@@ -44,7 +44,14 @@ jobs:
       - name: Build Wails app
         env:
           PATH: ${{ env.PATH }}:$(go env GOPATH)/bin
-        run: wails build -clean -platform ${{ matrix.os }}
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            wails build -clean -platform darwin
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            wails build -clean -platform windows/amd64
+          else
+            wails build -clean -platform linux/amd64
+          fi
 
       - name: Archive binary
         run: |
