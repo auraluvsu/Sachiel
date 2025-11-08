@@ -14,11 +14,11 @@
   },
   "platforms": {
     "darwin": {
-      "appicon": "frontend/src/icon.icns",
+      "appicon": "frontend/public/icon.icns",
       "appbundle": true
     },
     "windows": {
-      "icon": "frontend/src/icon.ico",
+      "icon": "frontend/public/icon.ico",
       "arch": "amd64"
     }
   }
