@@ -49,7 +49,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ./sachiel/frontend
-        run: npm install
+        run: npm ci
 
       - name: Build Wails app
         working-directory: ./sachiel
