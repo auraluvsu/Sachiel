@@ -54,9 +54,9 @@ jobs:
       - name: Build Wails app
         working-directory: ./sachiel
         run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
             wails build -clean -platform windows/amd64
-          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          elif [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             wails build -clean -platform linux/amd64
           else
             wails build -clean -platform darwin/universal
