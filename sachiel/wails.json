@@ -1,6 +1,6 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "sachiel",
+  "name": "Sachiel",
   "assetdir":"frontend",
   "wailsjsdir":"frontend/src",
   "outputfilename": "sachiel",
@@ -11,5 +11,15 @@
   "author": {
     "name": "",
     "email": ""
+  },
+  "platforms": {
+    "darwin": {
+      "appicon": "frontend/public/icon.icns",
+      "appbundle": true
+    },
+    "windows": {
+      "icon": "frontend/public/icon.ico",
+      "arch": "amd64"
+    }
   }
 }
